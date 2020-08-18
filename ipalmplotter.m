@@ -240,7 +240,7 @@ for a = 1:numlab
     if gaussfit
         ft = fittype('gauss1');
         try
-            fm = fit(x{a}',n{a}',ft);
+            fm = fit(cents',n{a}',ft);
             plot(fm,plotcolor{a})
             coeffs = coeffvalues(fm);
             gaussamp{a} = coeffs(1); 
