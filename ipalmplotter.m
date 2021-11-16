@@ -1147,7 +1147,7 @@ elseif distfromlab ~= disttolab
     xyz1 = [xpos(label == distfromlab) ypos(label == distfromlab) zpos(label == distfromlab)];
     xyz2 = [xpos(label == disttolab) ypos(label == disttolab) zpos(label == disttolab)];
     distmat = pdist2(xyz1,xyz2);
-    distmat = sqrt(distmat);
+    %distmat = sqrt(distmat);
 end
 nndist = min(distmat,[],2);
 NNidx = find(contains(paramlist,'NN_Distance'),1);
