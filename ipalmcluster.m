@@ -345,9 +345,10 @@ logy = handles.logy.Value;
 
 if isappdata(handles.filtercluster,'props1filt')
     props1filt = getappdata(handles.filtercluster,'props1filt');
-    [n1,x1] = histogram(props1filt(:,paramnum));
+    [n1,x1] = histcounts(props1filt(:,paramnum));
+    xc1 = mean([x1(1:(end-1)); x1(2:end)]);
     axes(handles.axes2);
-    bar(x1,n1,plotcolor(1));
+    bar(xc1,n1,plotcolor(1));
     if logx
         handles.axes2.XScale = 'log';
     else
@@ -363,9 +364,10 @@ end
 
 if isappdata(handles.filtercluster,'props2filt')
     props2filt = getappdata(handles.filtercluster,'props2filt');
-    [n2,x2] = histogram(props2filt(:,paramnum));
+    [n2,x2] = histcounts(props2filt(:,paramnum));
+    xc2 = mean([x2(1:(end-1)); x2(2:end)]);
     axes(handles.axes2);
-    bar(x2,n2,plotcolor(2));
+    bar(xc2,n2,plotcolor(2));
     if logx
         handles.axes2.XScale = 'log';
     else
@@ -381,9 +383,10 @@ end
 
 if isappdata(handles.filtercluster,'props3filt')
     props3filt = getappdata(handles.filtercluster,'props3filt');
-    [n3,x3] = histogram(props3filt(:,paramnum));
+    [n3,x3] = histcounts(props3filt(:,paramnum));
+    xc3 = mean([x3(1:(end-1)); x3(2:end)]);
     axes(handles.axes2);
-    bar(x3,n3,plotcolor(3));
+    bar(xc3,n3,plotcolor(3));
     if logx
         handles.axes2.XScale = 'log';
     else
@@ -705,8 +708,9 @@ nndist = min(distmat,[],2);
 setappdata(handles.calcdist,'nndist',nndist);
 axes(handles.axes3);
 cla;
-[n,x] = histogram(nndist,[],0);
-bar(x,n);
+[n,x] = histcounts(nndist);
+xc = mean([x(1:(end-1)); x(2:end)]);
+bar(xc,n);
 xlabel('Distance (nm)');
 ylabel('Count');
 mediannndist = median(nndist);

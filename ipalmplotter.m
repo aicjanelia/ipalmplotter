@@ -951,6 +951,15 @@ function coloc1_Callback(hObject, eventdata, handles)
 
 %get data and user inputs
 datafilt = getappdata(handles.filter,'datafilt');
+datamat = getappdata(handles.filter,'datamat');
+keepindx = getappdata(handles.filter,'keepindx');
+paramlist = getappdata(handles.loaddata,'paramlist');
+xposidx = find(contains(paramlist,'X_Position'),1);
+yposidx = find(contains(paramlist,'Y_Position'),1);
+zposidx = find(contains(paramlist,'Unwrapped_Z'),1);
+labelidx = find(contains(paramlist,'Label_Set'),1);
+colocidx = find(contains(paramlist,'Coloc_Value'),1);
+
 prompt = {'Direction (1 = red to green, 2 = green to red','Max search radius (nm)','Search radius increment (nm)'};
 dlg_title = 'Input coloc parameters';
 num_lines = 1;
@@ -962,15 +971,15 @@ rstep = str2double(answer{3});
 r = rstep:rstep:rmax;
 
 %extract xyz coords and separate by color
-xpos = datafilt(:,3);
-ypos = datafilt(:,4);
-zpos = datafilt(:,45);
-xposr = xpos(datafilt(:,27) == 1);
-yposr = ypos(datafilt(:,27) == 1);
-zposr = zpos(datafilt(:,27) == 1);
-xposg = xpos(datafilt(:,27) == 2);
-yposg = ypos(datafilt(:,27) == 2);
-zposg = zpos(datafilt(:,27) == 2);
+xpos = datafilt(:,xposidx);
+ypos = datafilt(:,yposidx);
+zpos = datafilt(:,zposidx);
+xposr = xpos(datafilt(:,labelidx) == 1);
+yposr = ypos(datafilt(:,labelidx) == 1);
+zposr = zpos(datafilt(:,labelidx) == 1);
+xposg = xpos(datafilt(:,labelidx) == 2);
+yposg = ypos(datafilt(:,labelidx) == 2);
+zposg = zpos(datafilt(:,labelidx) == 2);
 clear xpos ypos zpos
 Pr = [xposr yposr zposr];
 clear xposr yposr zposr;
@@ -981,10 +990,10 @@ clear xposg yposg zposg;
 disp('Calculating pair-wise distances...');
 if direction == 1
     pdistaa = pdist(Pr);
-    pdistab = sqrt(pdist2(Pr,Pg));
+    pdistab = pdist2(Pr,Pg);
 elseif direction == 2
     pdistaa = pdist(Pg);
-    pdistab = sqrt(pdist2(Pg,Pr));
+    pdistab = pdist2(Pg,Pr);
 end
 pdistaa = squareform(pdistaa);
 pdistaa(pdistaa == 0) = NaN;
@@ -1056,9 +1065,20 @@ if axisequal
     axis('equal');
 end
 c = colorbar;
-cinc = (max(C)-min(C))/5;
-clabels = {num2str(min(C)) num2str(min(C)+cinc) num2str(min(C)+2*cinc) num2str(min(C)+3*cinc) num2str(min(C)+4*cinc) num2str(min(C)+5*cinc)};
-c.TickLabels = clabels;
+currlabels = c.TickLabels;
+numclabels = length(currlabels);
+cinc = (max(C)-min(C))/(numclabels-1);
+clabels = minC:cinc:maxC;
+clabels2 = arrayfun(@num2str,clabels,'uniformoutput',0);
+c.TickLabels = clabels2;
+
+datafilt(datafilt(:,labelidx) == direction,colocidx) = C;
+datamat((datamat(:,labelidx) == direction & keepindx'),colocidx) = C;
+setappdata(handles.filter,'datafilt',datafilt);
+setappdata(handles.filter,'datamat',datamat);
+datatab = handles.datatable.Data;
+datatab(colocidx,:) = [min(datafilt(:,colocidx)) max(datafilt(:,colocidx))];
+handles.datatable.Data = datatab;
 
 
 % --- Executes on button press in fitsurf.
